@@ -5,13 +5,24 @@ import electron from 'vite-electron-plugin'
 import { customStart, loadViteEnv } from 'vite-electron-plugin/plugin'
 import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
+import { svgBuilder } from "./src/plugins/svgBuilder";
+import { fileURLToPath, URL } from "node:url";
+import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
+import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 
 rmSync('dist-electron', { recursive: true, force: true })
-
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
+    svgBuilder("./src/icons/"),
     electron({
       include: ['electron'],
       transformOptions: {
@@ -43,6 +54,12 @@ export default defineConfig({
   clearScreen: false,
   build: {
     assetsDir: '', // #287
+  },
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+    extensions: [".js", ".ts", ".json"],
   },
 })
 

@@ -1,0 +1,77 @@
+/* 公共class */
+.clear:after{
+	content:'';
+	display:block;
+	clear:both;
+}
+.clear{
+	zoom:1;
+}
+.fl{ 
+	float:left;
+}
+.fr{ 
+	float:right;
+}
+
+/* 公共样式 */
+html,body {
+  margin: 0;
+	padding: 0;
+	width: 100%;
+  height: 100%;
+	background-color: rgba(0,0,0,0);
+	font-size: 14px;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+/* 刷新遮罩层 */
+.el-loading-mask {
+	background-color: rgba(250, 250, 250, 0.9);
+}
+
+/* 等级图片 */
+.lv {
+	background-image: url('https://s1.hdslb.com/bfs/static/jinkela/search/assets/sprite-690be8a6ea.png');
+	width: 28px;
+	height: 16px;
+	display: inline-block;
+	line-height: 16px;
+	vertical-align: middle;
+	margin: 5px 0;
+}
+.lv.icon-lv0{
+	background-position:-148px -231px
+}
+.lv.icon-lv1{
+	background-position:-148px -185px
+}
+.lv.icon-lv2{
+	background-position:-148px -139px
+}
+.lv.icon-lv3{
+	background-position:-365px -438px
+}
+.lv.icon-lv4{
+	background-position:-319px -536px
+}
+.lv.icon-lv5{
+	background-position:-261px -536px
+}
+.lv.icon-lv6{
+	background-position:-377px -490px
+}
+.lv.icon-lv7{
+	background-position:-319px -490px
+}
+.lv.icon-lv8{
+	background-position:-377px -536px
+}
+.lv.icon-lv9{
+	background-position:-261px -490px
+}

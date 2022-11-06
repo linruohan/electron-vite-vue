@@ -12,10 +12,11 @@ process.env.DIST_ELECTRON = join(__dirname, '..')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
 process.env.PUBLIC = app.isPackaged ? process.env.DIST : join(process.env.DIST_ELECTRON, '../public')
 
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, session,
+  ipcMain,
+  type CookiesGetFilter, } from 'electron'
 import { release } from 'os'
 import { join } from 'path'
-
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
 
@@ -38,10 +39,61 @@ const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
+const listen = () => {
+  ipcMain.on("getCookie", (e: Event, options: CookiesGetFilter) => {
+    // 查询所有 cookies。
+    session.defaultSession.cookies
+      .get(options)
+      .then((cookies) => {
+        return { value: cookies };
+      })
+      .catch((error) => {
+        alert(error);
+        return { value: "" };
+      });
+  });
+  ipcMain.on(
+    "clearCookie",
+    (e: Event, options: { url: string; name: string }) => {
+      // 查询所有 cookies。
+      session.defaultSession.cookies.remove(options.url, options.name);
+    }
+  );
+  ipcMain.on("close", (event: Event) => win.destroy());
+  // 隐藏
+  ipcMain.on("window-hide", (event: Event) => {
+    win.hide();
+  });
+
+  // 显示
+  ipcMain.on("window-show", (event: Event) => {
+    win.show();
+  });
+
+  // 最小化
+  ipcMain.on("min", (event: Event) => {
+    win.minimize();
+  });
+
+  // 最大化
+  ipcMain.on("max", (event, winId) => {
+    win.maximize();
+  });
+};
 async function createWindow() {
+  listen()
   win = new BrowserWindow({
     title: 'Main window',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
+    resizable: true,
+    autoHideMenuBar: true,
+    minimizable: true,
+    maximizable: true,
+    movable: true,
+    darkTheme: true,
+    minWidth: 0,
+    minHeight: 0,
+    titleBarStyle: "hidden",
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -49,6 +101,8 @@ async function createWindow() {
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       nodeIntegration: true,
       contextIsolation: false,
+      // devTools: true,
+      webSecurity: false,
     },
   })
 
@@ -70,6 +124,7 @@ async function createWindow() {
     if (url.startsWith('https:')) shell.openExternal(url)
     return { action: 'deny' }
   })
+  
 }
 
 app.whenReady().then(createWindow)
