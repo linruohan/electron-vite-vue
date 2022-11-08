@@ -16,5 +16,5 @@ createApp(App)
   .component("svg-icon", svgIcon)
   .mount("#app")
   .$nextTick(() => {
-    postMessage({ payload: "removeLoading" }, "*");
-  });
+    postMessage({ payload: 'removeLoading' }, '*')
+  })

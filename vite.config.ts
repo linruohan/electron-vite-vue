@@ -12,6 +12,7 @@ import Components from "unplugin-vue-components/vite";
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 
 rmSync('dist-electron', { recursive: true, force: true })
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -35,7 +36,7 @@ export default defineConfig({
             customStart(debounce(() => console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App'))),
           ]
           : []),
-          // Allow use `import.meta.env.VITE_SOME_KEY` in Electron-Main
+        // Allow use `import.meta.env.VITE_SOME_KEY` in Electron-Main
         loadViteEnv(),
       ],
     }),
