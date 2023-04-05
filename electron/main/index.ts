@@ -94,7 +94,7 @@ async function createWindow() {
     darkTheme: true,
     minWidth: 0,
     minHeight: 0,
-    titleBarStyle: "hidden",
+    // titleBarStyle: "hidden",
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production

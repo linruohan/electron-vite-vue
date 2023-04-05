@@ -9,6 +9,9 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    DataView: typeof import('./src/components/DataView.vue')['default']
+    DataViewSub: typeof import('./src/components/DataViewSub.vue')['default']
+    DateViewSub: typeof import('./src/components/DateViewSub.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
@@ -24,6 +27,7 @@ declare module '@vue/runtime-core' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElSpace: typeof import('element-plus/es')['ElSpace']
     Empty: typeof import('./src/components/Empty.vue')['default']
+    EventCreateSub: typeof import('./src/components/EventCreateSub.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     LoaddingBar: typeof import('./src/components/LoaddingBar.vue')['default']
     RefreshButton: typeof import('./src/components/RefreshButton.vue')['default']
@@ -33,5 +37,6 @@ declare module '@vue/runtime-core' {
     Toast: typeof import('./src/components/toast.vue')['default']
     Tree: typeof import('./src/components/Tree/index.vue')['default']
     VideoCard: typeof import('./src/components/VideoCard.vue')['default']
+    WeatherSub: typeof import('./src/components/WeatherSub.vue')['default']
   }
 }

@@ -27,6 +27,12 @@
       </el-icon>
       <template #title>注册</template>
     </el-menu-item>
+    <el-menu-item index="/mycanlender">
+      <el-icon>
+        <svg-icon name="partition" size="24" />
+      </el-icon>
+      <template #title>mycanlender</template>
+    </el-menu-item>
     <el-menu-item index="/user">
       <el-icon>
         <svg-icon name="bangumi" size="24" />
