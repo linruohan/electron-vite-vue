@@ -8,9 +8,7 @@ import "./styles/element/index.scss";
 import ElementPlus from "element-plus";
 
 import svgIcon from "@/components/SvgIcon.vue";
-
 import PrimeVue from 'primevue/config';
-
 
 createApp(App)
   .use(router)

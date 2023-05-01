@@ -1,4 +1,14 @@
 <template>
+    <div>EventCreateSub</div>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref, computed } from "vue";
+
+</script>
+
+<style lang="less" scoped></style>
+<!-- <template>
     <n-drawer-content title="创建事件" closable>
         <n-space vertical>
             <n-input id="eventInput" v-model:value="eventText" placeholder="事件内容" />
@@ -64,4 +74,4 @@ export default defineComponent({
     },
 });
 </script>
-  
+   -->

@@ -1,4 +1,4 @@
 {
-    "search.followSymlinks": false,
-    "git.autorefresh": false
+    "editor.showFoldingControls": "always",
+    "editor.foldingStrategy": "auto"
 }

@@ -9,10 +9,9 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    DataView: typeof import('./src/components/DataView.vue')['default']
-    DataViewSub: typeof import('./src/components/DataViewSub.vue')['default']
     DateViewSub: typeof import('./src/components/DateViewSub.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
+    ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElContainer: typeof import('element-plus/es')['ElContainer']
@@ -25,10 +24,13 @@ declare module '@vue/runtime-core' {
     ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
+    ElPagination: typeof import('element-plus/es')['ElPagination']
+    ElRow: typeof import('element-plus/es')['ElRow']
     ElSpace: typeof import('element-plus/es')['ElSpace']
-    Empty: typeof import('./src/components/Empty.vue')['default']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTag: typeof import('element-plus/es')['ElTag']
     EventCreateSub: typeof import('./src/components/EventCreateSub.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     LoaddingBar: typeof import('./src/components/LoaddingBar.vue')['default']
     RefreshButton: typeof import('./src/components/RefreshButton.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

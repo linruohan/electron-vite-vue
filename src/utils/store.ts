@@ -1,6 +1,7 @@
 import { reactive } from "vue";
-import type { Data, Children, ChinaTotal, ChinaAdd, StatisGradeCityDetail } from '@/request/module/yiqing/type'
 import storage from "./storage";
+import type { FLocation } from '@/request/module/weather/info';
+
 
 const store = reactive({
   user: {
@@ -8,10 +9,18 @@ const store = reactive({
     mid: 0,
     csrf: "",
     userInfo: <any>storage.get(storage.USER_INFO)
-			? JSON.parse(storage.get(storage.USER_INFO))
-			: null,
-		token: <string | null>storage.get(storage.USER_TOKEN)
+      ? JSON.parse(storage.get(storage.USER_INFO))
+      : null,
+    token: <string | null>storage.get(storage.USER_TOKEN)
   },
+  themeValue: 'lightTheme',
+  showFestivals: false,
+  showWeather: false,
+  location: {
+    longitude: 114.52,
+    latitude: 38.02,
+  } as FLocation,
+  focusTime: 40,
   system: {
     isFullScreen: false,
   },
@@ -19,13 +28,23 @@ const store = reactive({
     store.user.isLogin = false;
     store.user.mid = 0;
   },
-  yiqing:{
-    counter: <number>0,
-		list: <Data>{},
-		item: <Children[]>[],
-		chinaAdd: <ChinaAdd>{},
-		chinaTotal: <ChinaTotal>{},
-		cityDetail: <StatisGradeCityDetail[]>[]
+  changeThemeValue: (themeValue: string) => {
+    store.themeValue = themeValue;
+  },
+  changeShowFestivals: () => {
+    store.showFestivals = !store.showFestivals;
+  },
+  changeShowWeather: () => {
+    store.showWeather = !store.showWeather;
+  },
+  changeLocation: (location: FLocation) => {
+    store.location = {
+      longitude: location.longitude,
+      latitude: location.latitude,
+    } as FLocation;
+  },
+  changeFocusTime(focusTime: number) {
+    store.focusTime = focusTime;
   },
 });
 export default store;

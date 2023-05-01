@@ -9,12 +9,6 @@
       </el-icon>
       <template #title>主页</template>
     </el-menu-item>
-    <el-menu-item index="/yiqing">
-      <el-icon>
-        <svg-icon name="hot" size="24" />
-      </el-icon>
-      <template #title>疫情统计</template>
-    </el-menu-item>
     <el-menu-item index="/login">
       <el-icon>
         <svg-icon name="trophy" size="24" />
@@ -29,7 +23,7 @@
     </el-menu-item>
     <el-menu-item index="/mycanlender">
       <el-icon>
-        <svg-icon name="partition" size="24" />
+        <svg-icon name="hot" size="24" />
       </el-icon>
       <template #title>mycanlender</template>
     </el-menu-item>
@@ -65,6 +59,8 @@ defineExpose({ showDialog })
 .aside {
   height: 100%;
   -webkit-app-region: drag;
+  background: rgb(53, 54, 58) !important;
+  color: rgba(232, 234, 237, 1) !important;
 
   .logo-wrap {
     padding-top: 55px;
@@ -74,6 +70,20 @@ defineExpose({ showDialog })
 
   .el-menu-item {
     -webkit-app-region: no-drag;
+  }
+
+  .el-menu-item:hover,
+  .el-menu-tooltip__trigger:hover {
+    color: rgb(53, 54, 58);
+    background: rgb(97, 141, 207) !important;
+  }
+
+  .el-icon {
+    color: rgb(232, 234, 237);
+  }
+
+  .el-icon:is-active {
+    color: rgb(232, 106, 188);
   }
 
   .user {

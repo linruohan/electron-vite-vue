@@ -11,11 +11,17 @@
   margin: 0;
 }
 
+a:-webkit-any-link {
+  color: rgb(119 119 255);
+}
+
 html,
 body,
 #app {
   height: 100%;
   overflow: hidden;
+  background: rgb(53, 54, 58);
+  color: rgba(232, 234, 237, 1);
 }
 
 #app {
@@ -23,7 +29,6 @@ body,
   /* -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center; */
-  color: #2c3e50;
 }
 
 .flex-center {

@@ -1,5 +1,5 @@
 // 天气预报相关
-export declare interface FLocation {
+export type FLocation = {
     longitude: number, // 经度
     latitude: number,  // 纬度
 }
@@ -81,3 +81,5 @@ export interface WeatherDaily {
     cloud: string,
     uvIndex: string,
 }
+
+

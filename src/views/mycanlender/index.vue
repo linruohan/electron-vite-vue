@@ -1,91 +1,110 @@
-
-
 <template>
-    <div class='demo-app'>
+    <div class='calendar'>
         <div class='demo-app-main'>
-            <FullCalendar ref="fullcalendar" class='demo-app-calendar' :options='calendarOptions'
-                :style="{ '--fc-today-bg-color': fc_today_bg_color }">
+            <FullCalendar ref="fullcalendar" class='fullcalendar' :options='calendarOptions' style="">
                 <template v-slot:eventContent='arg'>
                     <b>{{ arg.timeText }}</b>
                     <i>{{ arg.event.title }}</i>
                 </template>
             </FullCalendar>
+            <div class='demo-app-sidebar-section events'>
+                <h2>All Events ({{ currentEvents.length }})</h2>
+                <el-table :data="currentEvents.slice((currentPage - 1) * pagesize, currentPage * pagesize)" height="355"
+                    style="width: 100%;background: rgb(53, 54, 58);  color: rgba(232, 234, 237, 1);">
+                    <el-table-column type="index" width="50"></el-table-column>
+                    <el-table-column prop="title" label="日程" width="180"> </el-table-column>
+                    <el-table-column prop="startStr" label="日期" width="120"> </el-table-column>
+                    <el-table-column label="操作">
+                        <template v-slot:default="scope">
+                            <el-icon class="event-oprate-icon">
+                                <Edit @click="eventEdit(scope.row)" />
+                            </el-icon>
+                            <el-icon class="event-oprate-icon">
+                                <Delete @click="eventDelete(scope.row)" />
+                            </el-icon>
+                            <el-icon class="event-oprate-icon">
+                                <Search @click="eventSearch(scope.row)" />
+                            </el-icon>
+                        </template>
+
+                    </el-table-column>
+                </el-table>
+                <el-pagination hide-on-single-page background layout="prev, pager, next,total" :total="currentEvents.length"
+                    :page-size="pagesize" @current-change="current_change"></el-pagination>
+            </div>
         </div>
         <div class='demo-app-sidebar'>
-            <WeatherSub v-if="changeShowWeather" v-model:changeShowWeather="changeShowWeather"
-                v-model:location="location" />
-            <n-drawer v-model:show="showDrawer" :width="settingDrawerWidth" placement="left">
-                <DateViewSub v-if="visibleFullDateView" v-model:date="date" />
-                <event-create-sub v-if="visibleECSub" v-model:event="event" @add-event-click="addEventClick" />
-            </n-drawer>
-            <div class='demo-app-sidebar-section'>
-                <h2>Instructions</h2>
-                <ul>
-                    <li>Select dates and you will be prompted to create a new event</li>
-                    <li>Drag, drop, and resize events</li>
-                    <li>Click an event to delete it</li>
-                </ul>
-            </div>
             <div class='demo-app-sidebar-section'>
                 <label>
                     <input type='checkbox' :checked='calendarOptions.weekends' @change='handleWeekendsToggle' />
-                    toggle weekends
+                    切换周末
                 </label>
             </div>
             <div class='demo-app-sidebar-section'>
-                <h2>All Events ({{ currentEvents.length }})</h2>
-                <ul>
-                    <li v-for='event in currentEvents' :key='event.id'>
-                        <b>{{ event.startStr }}</b>
-                        <i>{{ event.title }}</i>
-                    </li>
-                </ul>
+                <WeatherSub />
             </div>
+            <div class='demo-app-sidebar-section'>
+                <DateViewSub :date="date" />
+            </div>
+            
+            <div class='demo-app-sidebar-section'>
+                <!-- <event-create-sub v-model:event="curEvent" @add-event-click="addEventClick" /> -->
+            </div>
+
         </div>
     </div>
 </template>
 
 <script lang='ts' setup>
-import { inject, reactive, ref } from 'vue'
-import CalendarViewService from '@/request/api/weather/CalendarViewService'
-import type { WeatherDaily, WeatherValueMap } from '@/request/module/weather/info';
-import type { GlobalTheme } from 'naive-ui';
-import { darkTheme, NCard, NElement as NEl, useThemeVars, NConfigProvider } from 'naive-ui';
-import { NDrawer } from 'naive-ui';
-import { CalendarOptions, EventApi, EventInput, DateSelectArg, EventClickArg } from '@fullcalendar/core'
+import { reactive, onMounted, ref } from 'vue'
+// fullcalendar
 import FullCalendar from '@fullcalendar/vue3'
-import type {
+import {
+    EventApi,
     CustomButtonInput,
     CalendarApi,
+    CalendarOptions,
+    DateSelectArg,
+    EventClickArg,
+    EventInput,
     EventSourceInput,
     DateRangeInput,
     DateInput,
-    DayCellContentArg,
-} from '@fullcalendar/vue3'
+    DayCellContentArg
+} from '@fullcalendar/core'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
 import zhLocale from '@fullcalendar/core/locales/zh-cn';
-import type { FLocation } from '@/request/module/weather/info';
+// import type {
+//     EventApi,
+//     CustomButtonInput,
+//     CalendarApi,
+//     CalendarOptions,
+//     DateSelectArg,
+//     EventClickArg,
+//     EventInput,
+//     EventSourceInput,
+//     DateRangeInput,
+//     DateInput,
+//     DayCellContentArg,
+// } from '@fullcalendar/vue3';
+
+import { Document, Delete, View, Edit, Search, Setting, Location, Menu } from "@element-plus/icons-vue";
+// services
+import type { FLocation, WeatherResult } from '@/request/module/weather/weather';
 import DateViewSub from '@/components/DateViewSub.vue';
-import WeatherSub from '@/components/WeatherSub.vue';
 import EventCreateSub from '@/components/EventCreateSub.vue';
-const location = reactive<FLocation>({
-    longitude: 114.52,
-    latitude: 38.02,
-})
-const date = ref<Date>(new Date())
-const visibleFullDateView = ref<Boolean>(true)
-const showDrawer = ref<Boolean>(false) //显示黄历
-const settingDrawerWidth = ref<string>(Number(700 / 4.0 * 3).toString())
+import store from '@/utils/store'
+
+// event
 let eventGuid = 0
 let todayStr = new Date().toISOString().replace(/T.*$/, '') // YYYY-MM-DD of today
-
-const themeVars = ref(useThemeVars());
-const fc_today_bg_color = ref(themeVars.value.primaryColor);
-
-const INITIAL_EVENTS: EventInput[] = [
+const createEventId = () => {
+    return String(eventGuid++)
+}
+const INITIAL_EVENTS = ref<EventInput[]>([
     {
         id: createEventId(),
         title: 'All-day event',
@@ -96,76 +115,79 @@ const INITIAL_EVENTS: EventInput[] = [
         title: 'Timed event',
         start: todayStr + 'T12:00:00'
     }
-]
-const events = ref(<EventInput[]>[]) // 所以事件列表
-const event = ref(<EventInput>{}); // 当前的event事件
-const visibleECSub = ref<Boolean>(false)
-function createEventId() {
-    return String(eventGuid++)
+])
+// =============end of events
+const date = ref<Date>(new Date())
+let pagesize = ref(5)//指定展示多少条
+let currentPage = ref(1)//当前页码
+const current_change = (e: number) => {
+    currentPage.value = e;
 }
-// date click
+
+onMounted(() => {
+    setTimeout(function () {
+        window.dispatchEvent(new Event('resize'));
+    }, 1);
+});
+const events = ref(<EventInput[]>[]) // 所有的事件列表
+const curEvent = ref(<EventInput>{}); // 当前的event事件
+
+// 周末显示切换
+const handleWeekendsToggle = () => {
+    calendarOptions.weekends = !calendarOptions.weekends // update a property
+}
+// 日历：日期点击事件
 const handleDateSelect = (selectInfo: DateSelectArg) => {
-    showDrawer.value = !showDrawer.value
-    visibleFullDateView.value = true
-    // let title = 'Please enter a new title for your event'
-    // let calendarApi = selectInfo.view.calendar
-    // calendarApi.unselect() // clear date selection
-    // if (title) {
-    //     calendarApi.addEvent({
-    //         id: createEventId(),
-    //         title,
-    //         start: selectInfo.startStr,
-    //         end: selectInfo.endStr,
-    //         allDay: selectInfo.allDay
-    //     })
-    // }
+    // 设置选择的日期
+    date.value = selectInfo.start
+
+    // 添加事件
+    let calendarApi = selectInfo.view.calendar
+    let title = 'Please enter a new title for your event'
+    calendarApi.unselect() // clear date selection
+    if (title) {
+        calendarApi.addEvent({
+            id: createEventId(),
+            title,
+            start: selectInfo.startStr,
+            end: selectInfo.endStr,
+            allDay: selectInfo.allDay
+        })
+    }
 }
-// event.click
+// 事件点击
 const handleEventClick = (clickInfo: EventClickArg) => {
-    showDrawer.value = true
-    visibleFullDateView.value = false
-    visibleECSub.value = true
-    alert(123)
-    event.value = clickInfo.event as EventInput
+    curEvent.value = clickInfo.event as EventInput
+
+    // 事件删除
     // if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
     // clickInfo.event.remove()
     // }
 }
-
-
 const addEventClick = (data: EventInput) => {
     console.log(data)
     if (data.id) {
         events.value.push(data)
     }
-    visibleECSub.value = false;
-    showDrawer.value = false
 }
+const currentEvents = ref<EventApi[]>([] as EventApi[])
 // eventsSet 设置
-const handleEvents = (event: EventApi[]) => {
-    currentEvents.value = event
+const handleEvents = (events: EventApi[]) => {
+    currentEvents.value = events
 }
-const changeShowFestivals = ref(true)
-const changeShowWeather = ref(false)
-const weather = inject('weather', {} as WeatherValueMap)
-const dayCellNewContent = () => {
-    return {
-        dayGridMonth: {
-            titleFormat: { year: 'numeric', month: '2-digit' },
-            dayCellContent(item: DayCellContentArg) {
-                const date = new Date(item.date);
-                const calendarViewService = new CalendarViewService();
-                return calendarViewService.showView(
-                    item.dayNumberText,
-                    date,
-                    changeShowFestivals.value,
-                    changeShowWeather.value,
-                    weather,
-                );
-            },
-        },
-    };
+const changeCurrentEvent = (row: EventInput) => {
+    curEvent.value = row
 }
+const eventEdit = (row: EventInput) => {
+    console.log(row)
+}
+const eventDelete = (row: EventInput) => {
+
+}
+const eventSearch = (row: EventInput) => {
+
+}
+
 const calendarOptions = reactive<CalendarOptions>({
     plugins: [
         dayGridPlugin,
@@ -179,15 +201,16 @@ const calendarOptions = reactive<CalendarOptions>({
         right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
     },
     initialView: 'dayGridMonth',
-    initialEvents: events.value, // alternatively, use the `events` setting to fetch from a feed
+    initialEvents: INITIAL_EVENTS.value, // alternatively, use the `events` setting to fetch from a feed
+
     editable: true,
     selectable: true,
     selectMirror: true,
     dayMaxEvents: true,
     weekends: true,
-    eventColor: "lightgrey",
+    // eventColor: "lightgrey",
     aspectRatio: 1,
-    handleWindowResize: false,
+    handleWindowResize: true,
     height: 800,
     locale: zhLocale,
     events: [
@@ -208,17 +231,17 @@ const calendarOptions = reactive<CalendarOptions>({
                 // day: '2-digit'
             },
             // other view-specific options here
-            dayCellContent(item: DayCellContentArg) {
-                const date = new Date(item.date);
-                const calendarViewService = new CalendarViewService();
-                return calendarViewService.showView(
-                    item.dayNumberText,
-                    date,
-                    changeShowFestivals.value,
-                    changeShowWeather.value,
-                    weather,
-                );
-            },
+            // dayCellContent(item: DayCellContentArg) {
+            //     const date = new Date(item.date);
+            //     const calendarViewService = new CalendarViewService();
+            //     return calendarViewService.showView(
+            //         item.dayNumberText,
+            //         date,
+            //         changeShowFestivals.value,
+            //         changeShowWeather.value,
+            //         weather,
+            //     );
+            // },
         },
         dayGrid: {
             // options apply to dayGridMonth, dayGridWeek, and dayGridDay views
@@ -237,27 +260,9 @@ const calendarOptions = reactive<CalendarOptions>({
         }
     }
 })
-const updateEvents = (update_events: EventInput[]) => {
-    // events.value = INITIAL_EVENTS
-    events.value = update_events;
-}
-const currentEvents = ref(<EventApi[]>[])
-const fullcalendar = ref(null);
-const fullcalendarApi = ref<CalendarApi>({});
-const handleWeekendsToggle = () => {
-    calendarOptions.weekends = !calendarOptions.weekends // update a property
-}
 
-const updateColors = () => {
-    calendarOptions.eventColor = themeVars.value.primaryColor;
-    fc_today_bg_color.value = convertHexToRGBA(themeVars.value.primaryColor, Number(themeVars.value.opacity5));
-}
-const updateView = () => {
-    if (fullcalendarApi.value == null) {
-        fullcalendarApi.value = Object.getOwnPropertyDescriptor(fullcalendar, 'getApi')?.value();
-    }
-    const viewContent = dayCellNewContent();
-    fullcalendarApi.changeView('dayGridMonth', viewContent['dayGridMonth'] as DateRangeInput | DateInput);
+const updateEvents = (update_events: EventInput[]) => {
+    events.value = update_events;
 }
 const convertHexToRGBA = (hex: string, opacity: number) => {
     const tempHex = hex.replace('#', '');
@@ -292,6 +297,66 @@ b {
     margin-right: 3px;
 }
 
+.fullcalendar {
+    font-family: LXGW WenKai;
+    font-size: 15px;
+    // background-color: rgb(53, 54, 58);
+    // color: rgba(232, 234, 237, 1);
+    height: 500px !important;
+}
+
+.fc {
+    max-width: unset !important;
+}
+
+.el-pagination.is-background .btn-next,
+.el-pagination.is-background .btn-prev,
+.el-pagination.is-background .el-pager li {
+    background: rgb(90, 93, 104) !important;
+    color: rgba(232, 234, 237, 1) !important;
+}
+
+.el-pagination.is-background .btn-next.is-active,
+.el-pagination.is-background .btn-prev.is-active,
+.el-pagination.is-background .el-pager li.is-active {
+    background: #ed5b8c !important;
+    color: rgb(0, 0, 0) !important;
+}
+
+.calendar {
+    display: flex;
+    min-height: 100%;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
+    background: rgb(53, 54, 58);
+    color: rgba(232, 234, 237, 1);
+}
+
+.el-table {
+    --el-table-text-color: rgba(232, 234, 237, 1);
+    --el-table-header-text-color: rgba(232, 234, 237, 1);
+    --el-table-header-bg-color: rgb(47, 74, 248);
+    --el-table-bg-color: rgb(53, 54, 58);
+    --el-table-tr-bg-color: rgb(53, 54, 58);
+    --el-table-row-hover-bg-color: #272827;
+}
+
+.el-icon {
+    color: rgba(232, 234, 237, 1)
+}
+
+.event-oprate-icon {
+    color: rgba(232, 234, 237, 1);
+    margin: 0 12px;
+}
+
+.event-oprate-icon:hover {
+    color: black;
+    background: green;
+    margin: 0 12px;
+    cursor: pointer;
+}
+
 .demo-app {
     display: flex;
     min-height: 100%;
@@ -302,17 +367,27 @@ b {
 .demo-app-sidebar {
     width: 500px;
     line-height: 1.5;
-    background: #eaf9ff;
+    // background: rgb(53, 54, 58);
+    // color: rgba(232, 234, 237, 1);
     border-right: 1px solid #d3e2e8;
 }
 
+.demo-app-sidebar-section.events {
+    border: 2px solid #8d3147;
+    border-radius: 8px !important;
+}
+
 .demo-app-sidebar-section {
-    padding: 2em;
+    padding: .2em;
 }
 
 .demo-app-main {
     flex-grow: 1;
-    padding: 3em;
+    padding: .3em;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: rgb(29 82 201 /76%);
 }
 
 .fc {
@@ -321,7 +396,10 @@ b {
     margin: 0 auto;
 }
 
-
+.event-start {
+    background-color: #2C3E50;
+    border-radius: 20px;
+}
 
 ::v-deep(.fc-header-toolbar) {
     height: 64px;
