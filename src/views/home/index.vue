@@ -13,7 +13,6 @@
       <img src="@/assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld msg="Electron + Vite + Vue" />
   <div class="flex-center">
     Place static files into the <code>/public</code> folder
     <img style="width:5em;" src="/node.svg" alt="Node logo">
@@ -21,6 +20,5 @@
 </template>
 
 <script lang="ts" setup>
-import HelloWorld from '@/components/HelloWorld.vue'
 console.log("[App.vue]", `Hello world from Electron ${process.versions.electron}!`)
 </script>
