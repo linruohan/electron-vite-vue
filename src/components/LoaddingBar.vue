@@ -1,7 +1,6 @@
 <template>
     <div class="wraps">
         <div ref="bar" class="bar">
-
         </div>
     </div>
 </template>

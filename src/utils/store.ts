@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 import storage from "./storage";
-import type { FLocation } from '@/request/module/weather/info';
+import type { FLocation } from '@/request/module/weather/weather';
 
 
 const store = reactive({

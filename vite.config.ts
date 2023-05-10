@@ -6,10 +6,6 @@ import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
 import { svgBuilder } from "./src/plugins/svgBuilder";
-import AutoImport from "unplugin-auto-import/vite";
-import Components from "unplugin-vue-components/vite";
-import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
-
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -22,12 +18,7 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [
       vue(),
-      AutoImport({
-        resolvers: [ElementPlusResolver()],
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()],
-      }),
+    
       svgBuilder("./src/icons/"),
       electron([
         {

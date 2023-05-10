@@ -32,7 +32,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref, defineProps, computed } from 'vue';
+import { ref, computed } from 'vue';
 import LunarService, { LunarServiceResult } from '@/request/api/weather/LunarService';
 const props = defineProps({
     date: Date,

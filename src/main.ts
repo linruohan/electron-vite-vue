@@ -4,7 +4,7 @@ import App from './App.vue'
 import router from "./router";
 import { createPinia } from "pinia";
 
-import "./styles/element/index.scss";
+import "@/assets/css/element_index.scss";
 import ElementPlus from "element-plus";
 
 import svgIcon from "@/components/SvgIcon.vue";

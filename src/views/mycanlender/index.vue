@@ -1,19 +1,16 @@
 <template>
     <div class='calendar'>
         <div class='demo-app-main'>
-            <FullCalendar ref="fullcalendar" class='fullcalendar' :options='calendarOptions' style="">
-                <template v-slot:eventContent='arg'>
-                    <b>{{ arg.timeText }}</b>
-                    <i>{{ arg.event.title }}</i>
-                </template>
-            </FullCalendar>
+            <CalendarSub ref="fullcalendar" :events="myEvents" @dateClick="handleDateClick" @eventClick="handleEventClick"
+                @eventsSet="handleEventsSet" />
             <div class='demo-app-sidebar-section events'>
-                <h2>All Events ({{ currentEvents.length }})</h2>
-                <el-table :data="currentEvents.slice((currentPage - 1) * pagesize, currentPage * pagesize)" height="355"
+                <h2>All Events ({{ myEvents.length }})</h2>
+                <el-table :data="myEvents.slice((currentPage - 1) * pagesize, currentPage * pagesize)" height="355"
                     style="width: 100%;background: rgb(53, 54, 58);  color: rgba(232, 234, 237, 1);">
                     <el-table-column type="index" width="50"></el-table-column>
                     <el-table-column prop="title" label="日程" width="180"> </el-table-column>
                     <el-table-column prop="startStr" label="日期" width="120"> </el-table-column>
+                    <el-table-column prop="endStr" label="日期" width="120"> </el-table-column>
                     <el-table-column label="操作">
                         <template v-slot:default="scope">
                             <el-icon class="event-oprate-icon">
@@ -29,24 +26,17 @@
 
                     </el-table-column>
                 </el-table>
-                <el-pagination hide-on-single-page background layout="prev, pager, next,total" :total="currentEvents.length"
+                <el-pagination hide-on-single-page background layout="prev, pager, next,total" :total="myEvents.length"
                     :page-size="pagesize" @current-change="current_change"></el-pagination>
             </div>
         </div>
         <div class='demo-app-sidebar'>
-            <div class='demo-app-sidebar-section'>
-                <label>
-                    <input type='checkbox' :checked='calendarOptions.weekends' @change='handleWeekendsToggle' />
-                    切换周末
-                </label>
-            </div>
             <div class='demo-app-sidebar-section'>
                 <WeatherSub />
             </div>
             <div class='demo-app-sidebar-section'>
                 <DateViewSub :date="date" />
             </div>
-            
             <div class='demo-app-sidebar-section'>
                 <!-- <event-create-sub v-model:event="curEvent" @add-event-click="addEventClick" /> -->
             </div>
@@ -56,66 +46,29 @@
 </template>
 
 <script lang='ts' setup>
-import { reactive, onMounted, ref } from 'vue'
-// fullcalendar
-import FullCalendar from '@fullcalendar/vue3'
-import {
-    EventApi,
+import { reactive, onMounted, PropType, ref } from 'vue'
+import { Document, Delete, View, Edit, Search, Setting, Location, Menu } from "@element-plus/icons-vue";
+// services 
+import type { FLocation, WeatherResult } from '@/request/module/weather/weather';
+import DateViewSub from '@/components/DateViewSub.vue';
+import WeatherSub from '@/components/WeatherSub.vue';
+import CalendarSub from '@/components/CalendarSub.vue';
+import EventCreateSub from '@/components/EventCreateSub.vue';
+import store from '@/utils/store'
+import type {
     CustomButtonInput,
     CalendarApi,
-    CalendarOptions,
+
+    EventApi,
     DateSelectArg,
     EventClickArg,
     EventInput,
     EventSourceInput,
     DateRangeInput,
     DateInput,
-    DayCellContentArg
-} from '@fullcalendar/core'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import listPlugin from '@fullcalendar/list'
-import zhLocale from '@fullcalendar/core/locales/zh-cn';
-// import type {
-//     EventApi,
-//     CustomButtonInput,
-//     CalendarApi,
-//     CalendarOptions,
-//     DateSelectArg,
-//     EventClickArg,
-//     EventInput,
-//     EventSourceInput,
-//     DateRangeInput,
-//     DateInput,
-//     DayCellContentArg,
-// } from '@fullcalendar/vue3';
-
-import { Document, Delete, View, Edit, Search, Setting, Location, Menu } from "@element-plus/icons-vue";
-// services
-import type { FLocation, WeatherResult } from '@/request/module/weather/weather';
-import DateViewSub from '@/components/DateViewSub.vue';
-import EventCreateSub from '@/components/EventCreateSub.vue';
-import store from '@/utils/store'
-
-// event
-let eventGuid = 0
-let todayStr = new Date().toISOString().replace(/T.*$/, '') // YYYY-MM-DD of today
-const createEventId = () => {
-    return String(eventGuid++)
-}
-const INITIAL_EVENTS = ref<EventInput[]>([
-    {
-        id: createEventId(),
-        title: 'All-day event',
-        start: todayStr
-    },
-    {
-        id: createEventId(),
-        title: 'Timed event',
-        start: todayStr + 'T12:00:00'
-    }
-])
+    DayCellContentArg,
+} from '@fullcalendar/core';
+import { INITIAL_EVENTS, createEventId } from '@/request/api/weather/EventService'
 // =============end of events
 const date = ref<Date>(new Date())
 let pagesize = ref(5)//指定展示多少条
@@ -129,18 +82,13 @@ onMounted(() => {
         window.dispatchEvent(new Event('resize'));
     }, 1);
 });
-const events = ref(<EventInput[]>[]) // 所有的事件列表
+const myEvents = ref<EventInput[]>(INITIAL_EVENTS)
 const curEvent = ref(<EventInput>{}); // 当前的event事件
 
-// 周末显示切换
-const handleWeekendsToggle = () => {
-    calendarOptions.weekends = !calendarOptions.weekends // update a property
-}
 // 日历：日期点击事件
-const handleDateSelect = (selectInfo: DateSelectArg) => {
+const handleDateClick = (selectInfo: DateSelectArg) => {
     // 设置选择的日期
     date.value = selectInfo.start
-
     // 添加事件
     let calendarApi = selectInfo.view.calendar
     let title = 'Please enter a new title for your event'
@@ -153,28 +101,46 @@ const handleDateSelect = (selectInfo: DateSelectArg) => {
             end: selectInfo.endStr,
             allDay: selectInfo.allDay
         })
+        myEvents.value.push({
+            id: createEventId(),
+            title,
+            start: selectInfo.startStr,
+            end: selectInfo.endStr,
+            allDay: selectInfo.allDay
+        })
     }
 }
 // 事件点击
 const handleEventClick = (clickInfo: EventClickArg) => {
     curEvent.value = clickInfo.event as EventInput
-
     // 事件删除
-    // if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-    // clickInfo.event.remove()
-    // }
+    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+        clickInfo.event.remove()
+    }
+}
+const handleEventsSet = (clickInfo: EventClickArg) => {
+
 }
 const addEventClick = (data: EventInput) => {
     console.log(data)
     if (data.id) {
-        events.value.push(data)
+        myEvents.value.push(data)
     }
+    // // 添加事件
+    // let calendarApi = selectInfo.view.calendar
+    // let title = 'Please enter a new title for your event'
+    // calendarApi.unselect() // clear date selection
+    // if (title) {
+    //     calendarApi.addEvent({
+    //         id: createEventId(),
+    //         title,
+    //         start: selectInfo.startStr,
+    //         end: selectInfo.endStr,
+    //         allDay: selectInfo.allDay
+    //     })
+    // }
 }
-const currentEvents = ref<EventApi[]>([] as EventApi[])
-// eventsSet 设置
-const handleEvents = (events: EventApi[]) => {
-    currentEvents.value = events
-}
+
 const changeCurrentEvent = (row: EventInput) => {
     curEvent.value = row
 }
@@ -187,90 +153,8 @@ const eventDelete = (row: EventInput) => {
 const eventSearch = (row: EventInput) => {
 
 }
-
-const calendarOptions = reactive<CalendarOptions>({
-    plugins: [
-        dayGridPlugin,
-        timeGridPlugin,
-        interactionPlugin, // needed for dateClick
-        listPlugin
-    ],
-    headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-    },
-    initialView: 'dayGridMonth',
-    initialEvents: INITIAL_EVENTS.value, // alternatively, use the `events` setting to fetch from a feed
-
-    editable: true,
-    selectable: true,
-    selectMirror: true,
-    dayMaxEvents: true,
-    weekends: true,
-    // eventColor: "lightgrey",
-    aspectRatio: 1,
-    handleWindowResize: true,
-    height: 800,
-    locale: zhLocale,
-    events: [
-        { title: 'Meeting', start: new Date() }
-    ],
-    select: handleDateSelect,
-    eventClick: handleEventClick,
-    eventsSet: handleEvents,
-    /* you can update a remote database when these fire:
-    eventAdd:
-    eventChange:
-    eventRemove:
-    */
-    views: {
-        dayGridMonth: { // name of view
-            titleFormat: {
-                year: 'numeric', month: '2-digit',
-                // day: '2-digit'
-            },
-            // other view-specific options here
-            // dayCellContent(item: DayCellContentArg) {
-            //     const date = new Date(item.date);
-            //     const calendarViewService = new CalendarViewService();
-            //     return calendarViewService.showView(
-            //         item.dayNumberText,
-            //         date,
-            //         changeShowFestivals.value,
-            //         changeShowWeather.value,
-            //         weather,
-            //     );
-            // },
-        },
-        dayGrid: {
-            // options apply to dayGridMonth, dayGridWeek, and dayGridDay views
-        },
-        timeGrid: {
-            // options apply to timeGridWeek and timeGridDay views
-        },
-        week: {
-            // options apply to dayGridWeek and timeGridWeek views
-        },
-        day: {
-            // options apply to dayGridDay and timeGridDay views
-            titleFormat: {
-                day: '2-digit'
-            },
-        }
-    }
-})
-
 const updateEvents = (update_events: EventInput[]) => {
-    events.value = update_events;
-}
-const convertHexToRGBA = (hex: string, opacity: number) => {
-    const tempHex = hex.replace('#', '');
-    const r = parseInt(tempHex.substring(0, 2), 16);
-    const g = parseInt(tempHex.substring(2, 4), 16);
-    const b = parseInt(tempHex.substring(4, 6), 16);
-
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    myEvents.value = update_events;
 }
 
 </script>
@@ -468,5 +352,13 @@ b {
 
 ::v-deep(.fc-day-sun) {
     color: var(--cyan-300) !important;
+}
+
+/* 可以进行这么设置 找到col标签
+https://juejin.cn/post/7036175157274083364
+设置垂直资源视图（resourceTimeGridDay）左侧时间宽度
+*/
+.fc-scrollgrid>colgroup>col {
+    min-width: 92px !important;
 }
 </style>
