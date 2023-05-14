@@ -16,7 +16,7 @@ const tagsViewStore = useTagsViewStore()
 
 console.log(tagsViewStore.cachedViews.toString())
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .main-wrap {
   flex: 1;
   // overflow: hidden;
@@ -25,7 +25,7 @@ console.log(tagsViewStore.cachedViews.toString())
 }
 
 .app-main {
-  position: absolute;
+  // position: absolute;
   padding: 20px 20px 20px 20px;
   top: 20px;
   bottom: 20px;
