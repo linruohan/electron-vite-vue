@@ -40,8 +40,8 @@ const toggleDark = useToggle(isDark)
 
 // 表单数据
 const sendData = reactive({
-  staff_account: '',
-  password: '',
+  staff_account: 'admin',
+  password: '1',
 })
 
 // 表单校验规则
@@ -52,7 +52,7 @@ const rules = reactive<FormRules>({
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
+    { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' },
   ],
 })
 
@@ -74,7 +74,8 @@ const loginHandle = (formEl: FormInstance | undefined) => {
       //     loginLoading.value = false
       //   })
       if (sendData.staff_account == "admin" && sendData.password == "1") {
-        router.push('/')
+        console.log(sendData)
+        router.push({ path: '/home' })
       }
     }
   })

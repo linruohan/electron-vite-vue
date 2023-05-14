@@ -18,8 +18,6 @@ const menus = ref([
   {
     id: 1, title: "首页", path: '/home', hidden: false, icon: "house",
   }, {
-    id: 2, title: "登录", path: '/login', hidden: false, icon: "trophy",
-  }, {
     id: 3, title: "注册", path: '/register', hidden: false, icon: "partition",
   }, {
     id: 4, title: "日历", path: '/mycanlender', hidden: false, icon: "hot",
