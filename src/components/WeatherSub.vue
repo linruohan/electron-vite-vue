@@ -321,8 +321,8 @@ img {
 
 
 .weather {
-    background: rgb(53, 54, 58);
-    color: rgba(232, 234, 237, 1);
+    // background: rgb(53, 54, 58);
+    // color: rgba(232, 234, 237, 1);
     font-family: 'LXGW WenKai';
     border: 2px solid #f06485;
 }

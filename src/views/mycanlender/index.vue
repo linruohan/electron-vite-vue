@@ -58,7 +58,6 @@ import store from '@/utils/store'
 import type {
     CustomButtonInput,
     CalendarApi,
-
     EventApi,
     DateSelectArg,
     EventClickArg,
@@ -158,7 +157,7 @@ const updateEvents = (update_events: EventInput[]) => {
 }
 
 </script>
-<style lang='scss' >
+<style lang='scss' scoped >
 @import "@/assets/css/weather_mac.scss";
 
 h2 {
@@ -196,8 +195,8 @@ b {
 .el-pagination.is-background .btn-next,
 .el-pagination.is-background .btn-prev,
 .el-pagination.is-background .el-pager li {
-    background: rgb(90, 93, 104) !important;
-    color: rgba(232, 234, 237, 1) !important;
+    // background: rgb(90, 93, 104) !important;
+    // color: rgba(232, 234, 237, 1) !important;
 }
 
 .el-pagination.is-background .btn-next.is-active,
@@ -212,8 +211,8 @@ b {
     min-height: 100%;
     font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
     font-size: 14px;
-    background: rgb(53, 54, 58);
-    color: rgba(232, 234, 237, 1);
+    // background: rgb(53, 54, 58);
+    // color: rgba(232, 234, 237, 1);
 }
 
 .el-table {
@@ -248,8 +247,12 @@ b {
     font-size: 14px;
 }
 
+.demo-app-main {
+    width: 80%;
+}
+
 .demo-app-sidebar {
-    width: 500px;
+    width: 20%;
     line-height: 1.5;
     // background: rgb(53, 54, 58);
     // color: rgba(232, 234, 237, 1);

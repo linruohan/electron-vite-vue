@@ -18,8 +18,7 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [
       vue(),
-    
-      svgBuilder("./src/icons/"),
+      svgBuilder("./src/assets/svgs/"),
       electron([
         {
           // Main-Process entry file of the Electron App.
@@ -77,6 +76,15 @@ export default defineConfig(({ command }) => {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
       },
       extensions: [".js", ".ts", ".json"],
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `
+            @use "./src/assets/style/main.scss" as globalScss;@use "./src/assets/style/element/index.scss" as *;
+          `,
+        },
+      },
     },
   }
 })

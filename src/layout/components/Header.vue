@@ -1,9 +1,17 @@
 <template>
   <div class="header-wrap">
     <div class="search-wrap">
-      <el-button type="info" class="back" v-show="store.system.isFullScreen" circle @click="router.back()">
-        <svg-icon name="arrow_left" />
-      </el-button>
+      <!-- 顶部 navbar -->
+      <navbar>
+        <template #collapse>
+          <div class="collapse-btn" :class="{ row: props.isCollapse }">
+            <svg-icon name="gengduo-heng" @click="hideIcon"></svg-icon>
+          </div>
+        </template>
+      </navbar>
+      <svg-icon name="arrow_left" v-show="!store.system.isFullScreen" @click="router.back()" />
+      <!-- 标签 -->
+      <tags-view></tags-view>
     </div>
     <el-space>
       <div class="btn" @click="BtnMinimize" style="background-color: #909399;">
@@ -22,19 +30,31 @@
 <script lang="ts" setup>
 import store from '@/utils/store'
 import { useRouter } from 'vue-router'
-
+import navbar from './Navbar.vue'
+import Navbar from './Navbar.vue'
+import TagsView from './TagsView.vue'
 const router = useRouter()
 const { ipcRenderer } = require('electron')
-
 const BtnMinimize = (() => { ipcRenderer.send('min') })
 const BtnMaximize = (() => { ipcRenderer.send('max') })
 const BtnWinClose = (() => { ipcRenderer.send('close') })
+const emit = defineEmits(['isCollapseClick'])
+const props = defineProps({
+  isCollapse: Boolean
+})
+const hideIcon = () => {
+  emit("isCollapseClick")
+}
 </script>
 
 <style lang="scss" scoped>
+.search-wrap {
+  height: 20px;
+}
+
 .header-wrap {
   width: 100%;
-  height: 40px;
+  height: 18px;
   -webkit-app-region: drag;
   display: flex;
   justify-content: space-between;
@@ -46,6 +66,10 @@ const BtnWinClose = (() => { ipcRenderer.send('close') })
     height: 100%;
   }
 
+  .el-button.is-circle {
+    padding: unset;
+  }
+
   .search-wrap {
     transform: translateY(6px);
     padding-left: 20px;
@@ -53,7 +77,7 @@ const BtnWinClose = (() => { ipcRenderer.send('close') })
     -webkit-app-region: no-drag;
 
     .back {
-      color: #999999;
+      // color: #999999;
       margin-right: 20px;
       -webkit-app-region: no-drag;
     }

@@ -59,8 +59,8 @@ defineExpose({ showDialog })
 .aside {
   height: 100%;
   -webkit-app-region: drag;
-  background: rgb(53, 54, 58) !important;
-  color: rgba(232, 234, 237, 1) !important;
+  // background: rgb(53, 54, 58) !important;
+  // color: rgba(232, 234, 237, 1) !important;
 
   .logo-wrap {
     padding-top: 55px;

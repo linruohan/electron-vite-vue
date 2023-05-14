@@ -94,7 +94,7 @@ async function createWindow() {
     darkTheme: true,
     minWidth: 0,
     minHeight: 0,
-    // titleBarStyle: "hidden",
+    titleBarStyle: "hidden",
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -114,7 +114,7 @@ async function createWindow() {
   } else {
     win.loadFile(indexHtml)
   }
-
+  win.maximize();
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())

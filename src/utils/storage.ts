@@ -17,6 +17,20 @@ const get = (key: string): any => {
     return localStorage.getItem(key)
 };
 
+const TokenKey = 'token'
+
+export function getToken() {
+    return localStorage.getItem(TokenKey)
+}
+
+export function setToken(token: string) {
+    return localStorage.setItem(TokenKey, token)
+}
+
+export function removeToken() {
+    return localStorage.setItem(TokenKey, '')
+}
+
 export default {
     set,
     get,

@@ -1,11 +1,12 @@
 <template>
   <el-container class="app-wrap">
     <el-aside v-show="!store.system.isFullScreen">
-      <Aside ref="AsideBar"></Aside>
+      <sidebar id="guide-sidebar" class="sidebar" :class="{ 'sidebar-container': !isCollapse }">
+      </sidebar>
     </el-aside>
     <el-container>
       <el-header>
-        <Header ref="Head"></Header>
+        <Header ref="Head" :isCollapse="isCollapse" @isCollapseClick="isCollapseClick"></Header>
       </el-header>
       <el-main>
         <Main></Main>
@@ -15,14 +16,17 @@
 </template>
 
 <script setup lang="ts">
-import Aside from "./components/Aside/index.vue";
+import Sidebar from './components/Sidebar/index.vue'
 import Main from "./components/Main.vue";
 import Header from "./components/Header.vue";
 import store from "@/utils/store";
-import { ref } from "vue";
+import { provide, ref } from 'vue';
 
-const AsideBar = ref()
-
+const isCollapse = ref(false)
+provide('isCollapse', isCollapse)
+const isCollapseClick = () => {
+  isCollapse.value = !isCollapse.value
+}
 </script>
 
 <style lang="scss" scoped>
@@ -41,6 +45,11 @@ const AsideBar = ref()
 
   .el-main {
     padding-right: 0;
+  }
+
+  .sidebar {
+    // background: rgb(53, 54, 58) !important;
+    // color: rgba(232, 234, 237, 1) !important;
   }
 }
 </style>

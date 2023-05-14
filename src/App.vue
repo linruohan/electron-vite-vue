@@ -12,7 +12,7 @@
 }
 
 a:-webkit-any-link {
-  color: rgb(119 119 255);
+  /* color: rgb(119 119 255); */
 }
 
 html,
@@ -20,8 +20,8 @@ body,
 #app {
   height: 100%;
   overflow: hidden;
-  background: rgb(53, 54, 58);
-  color: rgba(232, 234, 237, 1);
+  /* background: rgb(53, 54, 58); */
+  /* color: rgba(232, 234, 237, 1); */
 }
 
 #app {
