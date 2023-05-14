@@ -1,7 +1,7 @@
 <template>
   <div class="main-wrap">
     <router-view v-slot="{ Component, route }">
-      <transition name="fade-transform" appea mode="default">
+      <transition name="fade-transform" appear mode="default">
         <keep-alive :include="tagsViewStore.cachedViews">
           <component :is="Component" :key="route.path" class="app-main" />
         </keep-alive>
