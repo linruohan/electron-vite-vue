@@ -28,24 +28,10 @@ const tableData: User[] = [
     },
 ]
 const column = [
-    {
-        prop: 'date',
-        label: '日期',
-        width: '180'
-    },
-    {
-        prop: 'name',
-        label: '姓名',
-        width: '180'
-    },
-    {
-        prop: 'address',
-        label: '地址'
-    },
-    {
-        prop: 'operation',
-        label: '操作'
-    }
+    { prop: 'date', label: '日期', width: '180' },
+    { prop: 'name', label: '姓名', width: '180' },
+    { prop: 'address', label: '地址' },
+    { prop: 'operation', label: '操作' }
 ]
 const handleEdit = (index: number, row: User) => {
     console.log(index, row)
