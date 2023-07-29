@@ -6,31 +6,6 @@
 </template>
 
 <style>
-* {
-  padding: 0;
-  margin: 0;
-}
-
-a:-webkit-any-link {
-  /* color: rgb(119 119 255); */
-}
-
-html,
-body,
-#app {
-  height: 100%;
-  overflow: hidden;
-  /* background: rgb(53, 54, 58); */
-  /* color: rgba(232, 234, 237, 1); */
-}
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  /* -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center; */
-}
-
 .flex-center {
   display: flex;
   align-items: center;

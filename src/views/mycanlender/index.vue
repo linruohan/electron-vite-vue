@@ -90,7 +90,7 @@ const handleDateClick = (selectInfo: DateSelectArg) => {
     date.value = selectInfo.start
     // 添加事件
     let calendarApi = selectInfo.view.calendar
-    let title = 'Please enter a new title for your event'
+    let title = 'new event title'
     calendarApi.unselect() // clear date selection
     if (title) {
         calendarApi.addEvent({
