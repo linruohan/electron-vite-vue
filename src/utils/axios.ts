@@ -10,8 +10,7 @@ import { handleResponseErrors } from "./tools";
 // import router from "../router";
 // axios.defaults.adapter = require('axios/lib/adapters/http');
 axios.defaults.withCredentials = true;
-
-const base_url = process.env.VITE_DEV_SERVER_URL ? process.env.VITE_DEV_SERVER_URL : "http://127.0.0.1:3344"
+const base_url = import.meta.env.VITE_DEV_SERVER_URL ? import.meta.env.VITE_DEV_SERVER_URL : "http://127.0.0.1:3344"
 
 const service = axios.create({
   timeout: 3000,

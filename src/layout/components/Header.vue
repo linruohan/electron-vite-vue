@@ -34,10 +34,9 @@ import navbar from './Navbar.vue'
 import Navbar from './Navbar.vue'
 import TagsView from './TagsView.vue'
 const router = useRouter()
-const { ipcRenderer } = require('electron')
-const BtnMinimize = (() => { ipcRenderer.send('min') })
-const BtnMaximize = (() => { ipcRenderer.send('max') })
-const BtnWinClose = (() => { ipcRenderer.send('close') })
+const BtnMinimize = (() => { window.ipcRenderer.send('min') })
+const BtnMaximize = (() => { window.ipcRenderer.send('max') })
+const BtnWinClose = (() => { window.ipcRenderer.send('close') })
 const emit = defineEmits(['isCollapseClick'])
 const props = defineProps({
   isCollapse: Boolean

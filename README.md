@@ -1,5 +1,6 @@
-# electron-vite-vue
-
+# bilibili + electron-vite-vue
+ lbw1998/bilibili-desktop
+ 
 🥳 Really simple `Electron` + `Vue` + `Vite` boilerplate.
 
 <!-- [![awesome-vite](https://awesome.re/mentioned-badge.svg)](https://github.com/vitejs/awesome-vite) -->
