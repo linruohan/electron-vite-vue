@@ -15,10 +15,6 @@ const base_url = process.env.VITE_DEV_SERVER_URL ? process.env.VITE_DEV_SERVER_U
 
 const service = axios.create({
   timeout: 3000,
-  // headers: {
-  //   origin: 'https://www.bilibili.com',
-  //   referer: 'https://www.bilibili.com'
-  // },
 });
 
 // 请求拦截器

@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import { T } from '@fullcalendar/core/internal-common';
 import SidebarItem from './SidebarItem.vue'
 import { reactive, inject, ref, onMounted } from 'vue'
 
@@ -55,4 +54,5 @@ const sortMenus = (menus: any) => {
 }
 sortMenus(menus)
 </script>
-<style scoped></style>
+<style scoped>
+</style>

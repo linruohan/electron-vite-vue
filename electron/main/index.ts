@@ -1,6 +1,10 @@
-import { app, BrowserWindow, shell, ipcMain, type CookiesGetFilter, session } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, type CookiesGetFilter, session, IpcMainEvent } from 'electron'
 import { release } from 'node:os'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+globalThis.__filename = fileURLToPath(import.meta.url)
+globalThis.__dirname = dirname(__filename)
 
 // The built directory structure
 //
@@ -8,13 +12,13 @@ import { join } from 'node:path'
 // │ ├─┬ main
 // │ │ └── index.js    > Electron-Main
 // │ └─┬ preload
-// │   └── index.js    > Preload-Scripts
+// │   └── index.mjs    > Preload-Scripts
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
 process.env.DIST_ELECTRON = join(__dirname, '..')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
-process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
+process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
   ? join(process.env.DIST_ELECTRON, '../public')
   : process.env.DIST
 
@@ -36,12 +40,12 @@ if (!app.requestSingleInstanceLock()) {
 
 let win: BrowserWindow | null = null
 // Here, you can also use other preload
-const preload = join(__dirname, '../preload/index.js')
+const preload = join(__dirname, '../preload/index.mjs')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
 const listen = () => {
-  ipcMain.on("getCookie", (e: Event, options: CookiesGetFilter) => {
+  ipcMain.on("getCookie", (e: IpcMainEvent, options: CookiesGetFilter) => {
     // 查询所有 cookies。
     session.defaultSession.cookies
       .get(options)
@@ -55,24 +59,24 @@ const listen = () => {
   });
   ipcMain.on(
     "clearCookie",
-    (e: Event, options: { url: string; name: string }) => {
+    (e: IpcMainEvent, options: { url: string; name: string }) => {
       // 查询所有 cookies。
       session.defaultSession.cookies.remove(options.url, options.name);
     }
   );
-  ipcMain.on("close", (event: Event) => win.destroy());
+  ipcMain.on("close", (event: IpcMainEvent) => win.destroy());
   // 隐藏
-  ipcMain.on("window-hide", (event: Event) => {
+  ipcMain.on("window-hide", (event: IpcMainEvent) => {
     win.hide();
   });
 
   // 显示
-  ipcMain.on("window-show", (event: Event) => {
+  ipcMain.on("window-show", (event: IpcMainEvent) => {
     win.show();
   });
 
   // 最小化
-  ipcMain.on("min", (event: Event) => {
+  ipcMain.on("min", (event: IpcMainEvent) => {
     win.minimize();
   });
 
@@ -85,7 +89,7 @@ async function createWindow() {
   listen()
   win = new BrowserWindow({
     title: 'Main window',
-    icon: join(process.env.PUBLIC, 'favicon.ico'),
+    icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
     resizable: true,
     autoHideMenuBar: true,
     minimizable: true,
@@ -98,11 +102,13 @@ async function createWindow() {
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
+      // nodeIntegration: true,
+
       // Consider using contextBridge.exposeInMainWorld
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       nodeIntegration: true,
-      contextIsolation: false,
-      // devTools: true,
+      // contextIsolation: false,
+      devTools: true,
       webSecurity: false,
     },
   })
