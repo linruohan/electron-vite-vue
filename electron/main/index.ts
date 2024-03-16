@@ -18,9 +18,7 @@ globalThis.__dirname = dirname(__filename)
 //
 process.env.DIST_ELECTRON = join(__dirname, '..')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
-process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-  ? join(process.env.DIST_ELECTRON, '../public')
-  : process.env.DIST
+process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? join(process.env.DIST_ELECTRON, '../public') : process.env.DIST
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -45,46 +43,43 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
 const listen = () => {
-  ipcMain.on("getCookie", (e: IpcMainEvent, options: CookiesGetFilter) => {
+  ipcMain.on('getCookie', (e: IpcMainEvent, options: CookiesGetFilter) => {
     // 查询所有 cookies。
     session.defaultSession.cookies
       .get(options)
       .then((cookies) => {
-        return { value: cookies };
+        return { value: cookies }
       })
       .catch((error) => {
-        alert(error);
-        return { value: "" };
-      });
-  });
-  ipcMain.on(
-    "clearCookie",
-    (e: IpcMainEvent, options: { url: string; name: string }) => {
-      // 查询所有 cookies。
-      session.defaultSession.cookies.remove(options.url, options.name);
-    }
-  );
-  ipcMain.on("close", (event: IpcMainEvent) => win.destroy());
+        alert(error)
+        return { value: '' }
+      })
+  })
+  ipcMain.on('clearCookie', (e: IpcMainEvent, options: { url: string; name: string }) => {
+    // 查询所有 cookies。
+    session.defaultSession.cookies.remove(options.url, options.name)
+  })
+  ipcMain.on('close', (event: IpcMainEvent) => win.destroy())
   // 隐藏
-  ipcMain.on("window-hide", (event: IpcMainEvent) => {
-    win.hide();
-  });
+  ipcMain.on('window-hide', (event: IpcMainEvent) => {
+    win.hide()
+  })
 
   // 显示
-  ipcMain.on("window-show", (event: IpcMainEvent) => {
-    win.show();
-  });
+  ipcMain.on('window-show', (event: IpcMainEvent) => {
+    win.show()
+  })
 
   // 最小化
-  ipcMain.on("min", (event: IpcMainEvent) => {
-    win.minimize();
-  });
+  ipcMain.on('min', (event: IpcMainEvent) => {
+    win.minimize()
+  })
 
   // 最大化
-  ipcMain.on("max", (event, winId) => {
-    win.maximize();
-  });
-};
+  ipcMain.on('max', (event, winId) => {
+    win.maximize()
+  })
+}
 async function createWindow() {
   listen()
   win = new BrowserWindow({
@@ -98,7 +93,7 @@ async function createWindow() {
     darkTheme: true,
     minWidth: 0,
     minHeight: 0,
-    titleBarStyle: "hidden",
+    titleBarStyle: 'hidden',
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -113,14 +108,15 @@ async function createWindow() {
     },
   })
 
-  if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
+  if (process.env.VITE_DEV_SERVER_URL) {
+    // electron-vite-vue#298
     win.loadURL(url)
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }
-  win.maximize();
+  win.maximize()
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
